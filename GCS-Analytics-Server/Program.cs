@@ -39,14 +39,22 @@ namespace GCS_Analytics_Server
                 Console.WriteLine("Connection incomming...");
                 var stream = connection.GetStream();
                 DateTime now = DateTime.Now;
-                string filename = root + now.Year + "\\" + now.Month + "\\" + now.ToString("hh-mm-ss");
 
-                if (!Directory.Exists(root + now.Year)) Directory.CreateDirectory(root + now.Year);
-                if (!Directory.Exists(root + now.Month)) Directory.CreateDirectory(root + now.Year + "\\" + now.Month);
+                byte[] bytes = ReadToEnd(stream);
+                string str = Encoding.ASCII.GetString(bytes);
+                string[] parts = str.Split('\n');
+                string folder = parts[0].ToUpper();
+
+                string filename = root + folder + "\\" + now.Year + "\\" + now.ToString("MMM") + "\\" + now.ToString("dd") + "\\" + now.ToString("hh-mm-ss") + ".log";
+
+                if (!Directory.Exists(root + folder)) Directory.CreateDirectory(root + folder);
+                if (!Directory.Exists(root + folder + "\\" + now.Year)) Directory.CreateDirectory(root + folder + "\\" + now.Year);
+                if (!Directory.Exists(root + folder + "\\" + now.Year + "\\" + now.ToString("MMM"))) Directory.CreateDirectory(root + folder + "\\" + now.Year + "\\" + now.ToString("MMM"));
+                if (!Directory.Exists(root + folder + "\\" + now.Year + "\\" + now.ToString("MMM") + "\\" + now.ToString("dd"))) Directory.CreateDirectory(root + folder + "\\" + now.Year + "\\" + now.ToString("MMM") + "\\" + now.ToString("dd"));
 
                 Console.WriteLine("File to write: " + filename);
 
-                File.WriteAllBytes(filename, ReadToEnd(stream));
+                File.WriteAllBytes(filename, bytes);
 
             }
 
